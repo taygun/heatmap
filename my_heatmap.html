@@ -1,0 +1,105 @@
+<html>
+    <head>
+        <title>Arnhem Heatmap</title>
+        <link href='http://fonts.googleapis.com/css?family=Open+Sans|Raleway' rel='stylesheet' type='text/css'>
+        <style>
+            html, body, #map-canvas {
+                height: 100%;
+                margin: 0px;
+                padding: 0px;
+                font-family: 'Raleway', sans-serif;
+                z-index:1;
+                }
+        </style>
+        <script src="./papaparse.min.js"></script>
+        <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=visualization"></script>
+        <script src="./jquery-2.1.1.min.js"></script>
+        <script src="https://code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
+        <script src="data.json"></script>
+        <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.0/themes/smoothness/jquery-ui.css">
+
+
+    </head>
+
+    <body>
+        <div>
+        <h1>Heat</h1>
+        <h2 id="time"></h2>
+        </div>
+        <div id="map-canvas"></div>
+
+                <script>
+        var map, pointArray, heatmap;
+        var heatData, locations;
+        var dataLenght = data.length;
+        var dataIndex = 0;
+
+        locations = {
+            "1": new google.maps.LatLng(51.984097, 5.906741),
+            "2": new google.maps.LatLng(51.983198, 5.908359),
+            "3": new google.maps.LatLng(51.983087, 5.902696),
+            "4": new google.maps.LatLng(51.980918, 5.910075),
+            "5": new google.maps.LatLng(51.982518, 5.904995),
+            "6": new google.maps.LatLng(51.981352, 5.903604),
+            "7": new google.maps.LatLng(51.979518, 5.911261),
+            "8": new google.maps.LatLng(51.982111, 5.91212),
+            "9": new google.maps.LatLng(51.983925, 5.910537),
+            "10": new google.maps.LatLng(51.985789, 5.899776),
+            "11": new google.maps.LatLng(51.981596, 5.907622),
+            "12": new google.maps.LatLng(51.980509, 5.904765),
+            "13": new google.maps.LatLng(51.98194, 5.912071),
+            "65": new google.maps.LatLng(51.981831, 5.908418),
+            "66": new google.maps.LatLng(51.985682,  5.903624),
+            "67": new google.maps.LatLng( 51.982219, 5.909955),
+            "70": new google.maps.LatLng( 51.98117, 5.909196),
+        };
+
+        function nextData() {
+            if (dataIndex >= dataLenght)
+                dataIndex = 0;
+            document.getElementById("time").innerHTML = data[dataIndex].time;
+            heatData = [];
+            for (var id in data[dataIndex].data) {
+                if (data[dataIndex].data.hasOwnProperty(id)) {
+                    entry = {
+                        location: locations[id],
+                        weight: data[dataIndex].data[id]
+                    };
+                    heatData.push(entry);
+                }
+            }
+            dataIndex++;
+        };
+
+        function init() {
+            var mapOptions = {
+                zoom: 16,
+                center: new google.maps.LatLng(51.9820597, 5.9102887),
+                mapTypeId: google.maps.MapTypeId.TERRAIN
+            };
+            map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+
+            pointArray = new google.maps.MVCArray(heatData);
+            heatmap = new google.maps.visualization.HeatmapLayer({
+                data: pointArray
+            });
+            heatmap.setMap(map);
+            heatmap.set('radius', 100);
+        };
+        nextData();
+        google.maps.event.addDomListener(window, 'load', init);
+
+        function next_heat() {
+            nextData();
+            pointArray.clear();
+            for (var i = 0; i < heatData.length; i++) {
+                pointArray.push(heatData[i]);
+            }
+            window.setTimeout(next_heat, 500);
+        };
+
+        window.setTimeout(next_heat, 500);
+        </script>
+    </body>
+
+</html>
