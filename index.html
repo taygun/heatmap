@@ -11,26 +11,27 @@
                 z-index:1;
                 }
         </style>
-        <script src="./papaparse.min.js"></script>
         <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=visualization"></script>
         <script src="./jquery-2.1.1.min.js"></script>
         <script src="https://code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
         <script src="data.json"></script>
         <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.0/themes/smoothness/jquery-ui.css">
-
+        <link rel="stylesheet" href="main.css">
 
     </head>
 
     <body>
         <div>
         <h1>Heat</h1>
+        <button class="btn" id="start">Start</button>
+        <button class="btn" id="pause">Pause</button>
         <h2 id="time"></h2>
         </div>
         <div id="map-canvas"></div>
 
-                <script>
+        <script>
         var map, pointArray, heatmap;
-        var heatData, locations;
+        var heatData, locations, timeID;
         var dataLenght = data.length;
         var dataIndex = 0;
 
@@ -73,6 +74,7 @@
 
         function init() {
             var mapOptions = {
+                scrollwheel: false,
                 zoom: 16,
                 center: new google.maps.LatLng(51.9820597, 5.9102887),
                 mapTypeId: google.maps.MapTypeId.TERRAIN
@@ -81,7 +83,8 @@
 
             pointArray = new google.maps.MVCArray(heatData);
             heatmap = new google.maps.visualization.HeatmapLayer({
-                data: pointArray
+                data: pointArray,
+                maxIntensity: 200,
             });
             heatmap.setMap(map);
             heatmap.set('radius', 100);
@@ -95,10 +98,17 @@
             for (var i = 0; i < heatData.length; i++) {
                 pointArray.push(heatData[i]);
             }
-            window.setTimeout(next_heat, 500);
+            timeID = window.setTimeout(next_heat, 500);
         };
 
-        window.setTimeout(next_heat, 500);
+        $("#start").click(function(){
+            window.setTimeout(next_heat, 0);
+        });
+
+        $("#pause").click(function(){
+            clearTimeout(timeID);
+        });
+
         </script>
     </body>
 
